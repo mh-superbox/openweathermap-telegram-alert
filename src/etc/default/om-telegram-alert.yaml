@@ -1,0 +1,9 @@
+om:
+  lat: 0.0
+  lon: 0.0
+  appid: ''
+
+telegram:
+  token: ''
+  chat_ids:
+    - 123456789

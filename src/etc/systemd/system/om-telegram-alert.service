@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenWeatherMap Telegram Alert
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/om-telegram-alert.py
+ExecStartPost=/bin/sh -c "echo $MAINPID > /run/om-telegram-alert.pid"
+Environment=PYTHONUNBUFFERED=1
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

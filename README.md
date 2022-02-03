@@ -51,6 +51,6 @@ You can set OpenWeatherMap and Telegram settings in the `/etc/default/om-telegra
 The timer check every 15 minutes for new entries.
 
 ```shell
-cp src/etc/systemd/system/om-telegram-alert.* /etc/systemd/system
-systemctl enable --now om-telegram-alert.timer
+$ cp src/etc/systemd/system/om-telegram-alert.* /etc/systemd/system
+$ systemctl enable --now om-telegram-alert.timer
 ```

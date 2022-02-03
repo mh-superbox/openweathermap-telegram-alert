@@ -1,20 +1,22 @@
 #!/usr/bin/env python3
 import json
 import logging
-from dataclasses import is_dataclass, dataclass, field
+from dataclasses import dataclass
+from dataclasses import field
+from dataclasses import is_dataclass
+from datetime import datetime
 from pathlib import Path
 from tempfile import gettempdir
-from typing import Final, List
+from typing import Final
+from typing import List
 
 import requests
 import yaml
-from datetime import datetime
 
 OM_ONECALL_URL: Final[str] = "https://api.openweathermap.org/data/2.5/onecall"
 TELEGRAM_SEND_MSG_URL: Final[str] = "https://api.telegram.org/bot$TOKEN/sendMessage"
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s - %(message)s")
-
 logger = logging.getLogger("OpenWeatherMapTelegramAlert")
 
 
@@ -79,15 +81,19 @@ def send_telegram_message(config: Config, text: str):
 
 
 def check_alerts(config: Config):
-    _temp_filename = Path(gettempdir(), "om-alerts")
-    _temp_alerts: List[dict] = []
+    temp_filename = Path(gettempdir(), "om-alerts")
+    temp_alerts: List[dict] = []
 
-    if _temp_filename.exists():
-        _temp_alerts = json.loads(_temp_filename.read_text())
+    if temp_filename.exists():
+        temp_alerts = json.loads(temp_filename.read_text())
 
-    r = requests.get(
-        f"{OM_ONECALL_URL}?lat={config.om.lat}&lon={config.om.lon}&exclude=current,minutely,hourly,daily&appid={config.om.appid}",
+    om_url: str = (
+        f"{OM_ONECALL_URL}"
+        f"?lat={config.om.lat}&lon={config.om.lon}&exclude=current,minutely,hourly,daily"
+        f"&appid={config.om.appid}"
     )
+
+    r = requests.get(om_url)
 
     try:
         r.raise_for_status()
@@ -119,7 +125,7 @@ def check_alerts(config: Config):
 
         if alerts:
             for alert in alerts:
-                if alert in _temp_alerts:
+                if alert in temp_alerts:
                     continue
 
                 tags: List[str] = alert["tags"]
@@ -133,9 +139,9 @@ def check_alerts(config: Config):
                     )
 
                     send_telegram_message(config, message)
-                    _temp_alerts.append(alert)
+                    temp_alerts.append(alert)
 
-            _temp_filename.write_text(json.dumps(_temp_alerts))
+            temp_filename.write_text(json.dumps(temp_alerts))
 
 
 def main():

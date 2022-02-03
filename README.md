@@ -2,6 +2,8 @@
 
 Send OpenWeatherMap alerts (One Call API) to telegram users.
 
+![Features](assets/screenshot.png)
+
 ## Installation
 
 **Requirements:**
@@ -29,18 +31,19 @@ You can set OpenWeatherMap and Telegram settings in the `/etc/default/om-telegra
 
 ### OpenWeaterMap
 
-| Key     | Value                                            |
-|---------|--------------------------------------------------|
-| `lat`   | latitude - Geographical coordinates (required).  |
-| `lon`   | longitude - Geographical coordinates (required). |
-| `appid` | Your unique API key (required).                  |
+| Key            | Value                                              |
+|----------------|----------------------------------------------------|
+| `lat`          | latitude - Geographical coordinates (required).    |
+| `lon`          | longitude - Geographical coordinates (required).   |
+| `appid`        | Your unique API key (required).                    |
+| `exclude_tags` | A list of tags to exlclude from sending messages. |
 
 ### Telegram
 
-| Key         | Value                           |
-|-------------|---------------------------------|
-| `token`     | Bot token (required).           |
-| `chat_ids`  | User chat ids (required).       |
+| Key        | Value                     |
+|------------|---------------------------|
+| `token`    | Bot token (required).     |
+| `chat_ids` | User chat ids (required). |
 
 
 ## Start systemd timer

@@ -45,7 +45,6 @@ You can set OpenWeatherMap and Telegram settings in the `/etc/default/om-telegra
 | `token`    | Bot token (required).     |
 | `chat_ids` | User chat ids (required). |
 
-
 ## Start systemd timer
 
 The timer check every 15 minutes for new entries.

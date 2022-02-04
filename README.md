@@ -9,7 +9,7 @@ Send OpenWeatherMap alerts (One Call API) to telegram users.
 **Requirements:**
 
 ```shell
-$ apt install python3-requests
+$ apt install python3-yaml python3-requests
 ```
 
 Copy the `om-telegram-alert.py` file:

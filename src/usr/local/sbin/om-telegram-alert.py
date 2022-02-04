@@ -141,6 +141,9 @@ def check_alerts(config: Config):
                     send_telegram_message(config, message)
                     temp_alerts.append(alert)
 
+            if len(temp_alerts) > 20:
+                temp_alerts = temp_alerts[10:]
+
             temp_filename.write_text(json.dumps(temp_alerts))
 
 

@@ -53,3 +53,9 @@ The timer check every 15 minutes for new entries.
 $ cp src/etc/systemd/system/om-telegram-alert.* /etc/systemd/system
 $ systemctl enable --now om-telegram-alert.timer
 ```
+
+## Changelog
+
+### 1.0.1
+
+* Clean temporary file if there are more than 20 entries

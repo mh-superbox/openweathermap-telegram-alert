@@ -151,7 +151,8 @@ def check_alerts(config: Config):
                 if not any(tag in tags for tag in config.om.exclude_tags):
                     message: str = (
                         f"""*{alert["event"]}!* {alert["description"]}\n\n"""
-                        f"""Time: {datetime.utcfromtimestamp(alert["start"]).strftime("%d.%m.%Y, %H:%M")} | Tags: {",".join(alert["tags"])}"""
+                        f"""Time: {datetime.utcfromtimestamp(alert["start"]).strftime("%d.%m.%Y, %H:%M")}\n"""
+                        f"""Tags: {",".join(alert["tags"])}"""
                     )
 
                     send_telegram_message(config, message)

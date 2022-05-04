@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import json
 import logging
+import re
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import is_dataclass
@@ -9,6 +10,7 @@ from pathlib import Path
 from tempfile import gettempdir
 from typing import Final
 from typing import List
+from typing import Tuple
 
 import requests
 import yaml
@@ -107,24 +109,40 @@ def check_alerts(config: Config):
         # alerts = [
         #     {
         #         "sender_name": "ZAMG Zentralanstalt für Meteorologie und Geodynamik",
-        #         "event": "Snow-Icewarning",
-        #         "start": 1643626800,
-        #         "end": 1643842800,
-        #         "description": "Fresh snow up to 80 cm is possible.",
-        #         "tags": ["Snow/Ice"],
+        #         "event": "Thunderstormwarning",
+        #         "start": 1651659170,
+        #         "end": 1651666370,
+        #         "description": "Henceforth (04.05.2022 12:12) thunderstorms are possible.",
+        #         "tags": ["Thunderstorm"],
         #     },
         #     {
         #         "sender_name": "ZAMG Zentralanstalt für Meteorologie und Geodynamik",
-        #         "event": "Stormwarning",
-        #         "start": 1643720400,
-        #         "end": 1643814000,
-        #         "description": "Gusts of 80 kph are possible.",
-        #         "tags": ["Wind"],
+        #         "event": "Thunderstormwarning",
+        #         "start": 1651660082,
+        #         "end": 1651667282,
+        #         "description": "Henceforth (04.05.2022 12:29) thunderstorms are possible.",
+        #         "tags": ["Thunderstorm"],
+        #     },
+        #     {
+        #         "sender_name": "ZAMG Zentralanstalt für Meteorologie und Geodynamik",
+        #         "event": "Thunderstormwarning",
+        #         "start": 1651674868,
+        #         "end": 1651682068,
+        #         "description": "Henceforth (04.05.2022 16:34) thunderstorms with gusts and hail are possible.",
+        #         "tags": ["Thunderstorm"],
         #     },
         # ]
 
+        regex_replaces: List[Tuple[str, str]] = [
+            # Remove Date/Time from alert description to avoid duplicate warnings!
+            (r"\s\(\d{2}\.\d{2}\.\d{4}\s\d{2}:\d{2}\)", ""),
+        ]
+
         if alerts:
             for alert in alerts:
+                for regex_replace in regex_replaces:
+                    alert["description"] = re.sub(regex_replace[0], regex_replace[1], alert["description"])
+
                 if alert in temp_alerts:
                     continue
 
@@ -132,10 +150,8 @@ def check_alerts(config: Config):
 
                 if not any(tag in tags for tag in config.om.exclude_tags):
                     message: str = (
-                        f"""*{alert["event"]}!*\n`{alert["description"]}`\n\n"""
-                        f"""*Start:* {datetime.utcfromtimestamp(alert["start"]).strftime("%d.%m.%Y, %H:%M")}\n"""
-                        f"""*End:* {datetime.utcfromtimestamp(alert["end"]).strftime("%d.%m.%Y, %H:%M")}\n"""
-                        f"""*Tags*: {",".join(alert["tags"])}\n"""
+                        f"""*{alert["event"]}!* {alert["description"]}\n\n"""
+                        f"""Time: {datetime.utcfromtimestamp(alert["start"]).strftime("%d.%m.%Y, %H:%M")} | Tags: {",".join(alert["tags"])}"""
                     )
 
                     send_telegram_message(config, message)

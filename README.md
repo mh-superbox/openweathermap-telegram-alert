@@ -56,6 +56,10 @@ $ systemctl enable --now om-telegram-alert.timer
 
 ## Changelog
 
+### 1.0.2
+
+* Avoid sending alerts that are duplicates and have a new timestamp
+
 ### 1.0.1
 
 * Clean temporary file if there are more than 20 entries

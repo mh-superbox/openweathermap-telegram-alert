@@ -5,6 +5,7 @@
 .mypy_cache
 .idea
 ._*
+.venv
 *.swp
 build/*
 dist/*

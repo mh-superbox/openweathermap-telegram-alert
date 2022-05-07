@@ -82,6 +82,23 @@ def send_telegram_message(config: Config, text: str):
                 logger.error("[TELEGRAM] %s", str(e))
 
 
+def processing_alert(alert: dict) -> Tuple[dict, str]:
+    regex_replaces: List[Tuple[str, str]] = [
+        # Remove Date/Time from alert description to avoid duplicate warnings!
+        (r"\s\(\d{2}\.\d{2}\.\d{4}\s\d{2}:\d{2}\)", ""),
+    ]
+
+    for regex_replace in regex_replaces:
+        alert["description"] = re.sub(regex_replace[0], regex_replace[1], alert["description"])
+
+    alert_start: datetime = datetime.utcfromtimestamp(alert["start"])
+    alert["date"] = alert_start.strftime("%Y-%m-%d")
+    alert.pop("start")
+    alert.pop("end")
+
+    return alert, alert_start.strftime("%d.%m.%Y, %H:%M")
+
+
 def check_alerts(config: Config):
     temp_filename = Path(gettempdir(), "om-alerts")
     temp_alerts: List[dict] = []
@@ -133,15 +150,9 @@ def check_alerts(config: Config):
         #     },
         # ]
 
-        regex_replaces: List[Tuple[str, str]] = [
-            # Remove Date/Time from alert description to avoid duplicate warnings!
-            (r"\s\(\d{2}\.\d{2}\.\d{4}\s\d{2}:\d{2}\)", ""),
-        ]
-
         if alerts:
             for alert in alerts:
-                for regex_replace in regex_replaces:
-                    alert["description"] = re.sub(regex_replace[0], regex_replace[1], alert["description"])
+                alert, alert_time = processing_alert(alert)
 
                 if alert in temp_alerts:
                     continue
@@ -151,7 +162,7 @@ def check_alerts(config: Config):
                 if not any(tag in tags for tag in config.om.exclude_tags):
                     message: str = (
                         f"""*{alert["event"]}!* {alert["description"]}\n\n"""
-                        f"""Time: {datetime.utcfromtimestamp(alert["start"]).strftime("%d.%m.%Y, %H:%M")}\n"""
+                        f"""Time: {alert_time}\n"""
                         f"""Tags: {",".join(alert["tags"])}"""
                     )
 
